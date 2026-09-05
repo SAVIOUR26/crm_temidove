@@ -16,8 +16,9 @@ class StudentDao extends DatabaseAccessor<AppDatabase> with _$StudentDaoMixin {
       ..where(enrollments.batchId.equals(batchId) &
           students.isDeleted.equals(false) &
           enrollments.isDeleted.equals(false));
-    return query.watch().map((rows) =>
-        rows.map((r) => r.readTable(students)).toList());
+    return query
+        .watch()
+        .map((rows) => rows.map((r) => r.readTable(students)).toList());
   }
 
   /// Dashboard search/filter — mirrors dashboard.php's search box
@@ -58,10 +59,9 @@ class StudentDao extends DatabaseAccessor<AppDatabase> with _$StudentDaoMixin {
 
   /// Exact phone match, used by the batch-tracker importer to avoid
   /// creating a duplicate Student row for someone already in the system.
-  Future<Student?> findByPhone(String phone) =>
-      (select(students)
-            ..where((s) => s.phone.equals(phone) & s.isDeleted.equals(false)))
-          .getSingleOrNull();
+  Future<Student?> findByPhone(String phone) => (select(students)
+        ..where((s) => s.phone.equals(phone) & s.isDeleted.equals(false)))
+      .getSingleOrNull();
 
   Stream<Student?> watchById(String id) =>
       (select(students)..where((s) => s.id.equals(id))).watchSingleOrNull();

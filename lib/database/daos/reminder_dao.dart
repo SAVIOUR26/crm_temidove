@@ -18,5 +18,6 @@ class ReminderDao extends DatabaseAccessor<AppDatabase>
             ..limit(1))
           .getSingleOrNull();
 
-  Future<int> log(ReminderLogCompanion entry) => into(reminderLog).insert(entry);
+  Future<int> log(ReminderLogCompanion entry) =>
+      into(reminderLog).insert(entry);
 }

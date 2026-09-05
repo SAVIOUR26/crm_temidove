@@ -74,8 +74,10 @@ nicer than Excel."
 
 ## Current state (post-completion pass)
 
-The v1 feature set described below is built and wired end-to-end. What
-exists:
+The v1 feature set described below is built and wired end-to-end,
+including a full UI/branding pass and real admin-gated login (the
+client asked for both explicitly — see "UI/branding pass" and "Auth"
+below). What exists:
 
 - Full Drift schema, all 7 tables (`lib/database/database.dart`). Note:
   the `Batches` table's data class is `BatchData`, not `Batch` — it was
@@ -107,8 +109,10 @@ exists:
   the file header for why) map to Departments/Staff/Students+Enrollments.
   No payment data is fabricated from this path — the old app never
   tracked fees (see `legacy/NOTES.md`).
-- App shell with 5-tab navigation (Payments due / Departments /
-  Students / Staff / Import).
+- App shell (`lib/app_shell.dart`) with 6-tab navigation (Dashboard /
+  Payments / Departments / Students / Staff / Import) — the last two
+  are admin-only, see "Auth" below — gated behind login/first-run
+  admin setup (`lib/features/auth/auth_gate.dart`).
 - Departments screen: full grid with add/edit, matches old
   `departments.php`, tapping a card drills into...
 - Batches screen (`lib/features/batches/batches_screen.dart`): add/edit
@@ -124,31 +128,115 @@ exists:
   status + staff-assignment dropdowns, every enrollment with its full
   payment schedule (record payments inline), and an editable notes
   field — the equivalent of old `dashboard.php`'s edit/view modals.
-- Staff screen: simple roster CRUD (full name/username/role) — this is
-  NOT a login screen, see the auth note below.
+- Staff screen: roster CRUD (full name/username/role/password),
+  reachable only by an admin — see "Auth" below.
 - Payments dashboard: full due/overdue list with working
   one-tap-reminder and one-tap "Record payment".
-- Windows/Linux platform scaffolding (`windows/`, generated via
+- Windows platform scaffolding (`windows/`, generated via
   `flutter create`) — this was **missing entirely** at handoff, which
   meant `.github/workflows/build-windows.yml`'s `flutter build windows`
   step could never have succeeded. If a build platform folder ever goes
   missing again (e.g. after a bad merge), regenerate it with
   `flutter create --platforms=windows --org com.temidove --project-name temidove_crm .`
   — it only fills in missing platform files, it won't touch `lib/`.
-- A widget smoke test (`test/widget_test.dart`) boots the real app shell
-  against an in-memory database (`AppDatabase.forTesting`) and checks
-  all 5 nav destinations render — run with `flutter test`.
+- A widget smoke test (`test/widget_test.dart`) boots the real app
+  against an in-memory database (`AppDatabase.forTesting`), goes through
+  first-run admin setup, and checks every nav destination renders —
+  run with `flutter test`.
+
+### UI/branding pass
+
+The client asked for a modern, colorful, professional look rather than
+the default Flutter/Material scaffolding — this touched every screen:
+
+- `lib/theme/app_theme.dart` / `app_colors.dart` — one Material 3
+  `ThemeData` (brand blue `#1E3A8A` / cyan `#06B6D4`, pinned onto
+  `ColorScheme.primary`/`secondary` rather than left to
+  `ColorScheme.fromSeed`'s own tonal algorithm, which visibly
+  desaturates a seed color — see the comment in `app_theme.dart` if
+  you're wondering why buttons don't just use `.fromSeed()` output
+  directly). Cards, dialogs, inputs, chips, and the nav rail all pick
+  this up automatically via component theme defaults — screens
+  shouldn't need to hardcode colors outside of `AppColors`' semantic
+  status colors (paid/overdue/pending).
+- **Inter** (OFL-licensed) is bundled locally under `assets/fonts/` and
+  declared in `pubspec.yaml`'s `fonts:` section — deliberately NOT
+  `package:google_fonts`, which fetches over the network at runtime by
+  default; this is an offline-first desktop app (see "What this is"),
+  so typography can't depend on a staff PC having internet the first
+  time a screen renders.
+- `lib/features/splash/splash_screen.dart` — branded animated splash
+  shown for a minimum ~1.1s on launch (see `AuthGate`) while the app
+  checks whether any Staff account exists yet.
+- `lib/features/dashboard/dashboard_screen.dart` — new landing tab:
+  KPI cards (total students, active batches, overdue payments +
+  outstanding amount, this month's collected-vs-expected) plus a
+  students-by-status breakdown, backed by `DashboardDao`'s aggregate
+  queries (`lib/database/daos/dashboard_dao.dart`).
+- `lib/app_shell.dart` — the nav rail itself now carries the app's icon
+  mark at top and the signed-in user's avatar (+ sign-out menu) pinned
+  at the bottom, so branding and "who am I / how do I leave" each have
+  exactly one place in the UI instead of being repeated per screen.
+- App icon (`windows/runner/resources/app_icon.ico`, and
+  `assets/icon/app_icon.png` for in-app use) was regenerated from
+  scratch — the default Flutter icon was still in place at handoff.
+  It's a programmatically-drawn gradient badge (`assets/icon/` has no
+  source file checked in; regenerate by re-running the icon-drawing
+  script used during this pass if it ever needs to change — search the
+  session history, or just re-draw it, it's a simple Pillow script).
+
+### Auth
+
+Resolves the handoff's open "does v1 need login" question — the client
+confirmed yes, an admin should control who else gets access:
+
+- `lib/features/auth/auth_state.dart` — `AuthState` (a
+  `ChangeNotifier`, provided at the root next to `AppDatabase`) is the
+  whole session model. Deliberately simple: **no persisted session** —
+  every app launch requires signing in again, and there's no
+  password-reset flow. This is a single-office LOB tool, not a
+  multi-tenant product; don't add JWT/refresh-token machinery here.
+- **First run**: `AuthState.status` is `needsSetup` when
+  `StaffDao.hasAnyStaff()` is false, which routes to
+  `SetupAdminScreen` — the very first account created on a PC is
+  always `role: 'admin'`, no way around it (only an admin can add more
+  staff afterwards, from `StaffScreen`).
+- Passwords are bcrypt-hashed with `package:bcrypt`
+  (`BCrypt.hashpw`/`checkpw`) — the same scheme
+  `legacy/Temidove_Online_PHP` already used for its `users.password`
+  column. `BCrypt.checkpw` reads the hash's own minor-version byte
+  (`$2a$`/`$2b$`/`$2y$`), so legacy hashes carried over by
+  `csv_legacy_importer.dart` verify correctly with no normalization
+  needed — confirmed by reading the `bcrypt` package's own source
+  rather than assumed.
+- **Role gating**: `AuthState.isAdmin` hides the Staff and Import nav
+  destinations entirely for a `role: 'staff'` account (see
+  `app_shell.dart`) — both because Import can bulk-create/overwrite
+  data and because staff credentials shouldn't be staff-editable. This
+  was an interpretation call (the client said "admin adds other
+  staff," which doesn't by itself say what a non-admin should or
+  shouldn't see elsewhere) — **worth confirming with the client**
+  whether non-admin staff should also be restricted from anything
+  currently left open (Departments/Students/Payments).
+
+### Installer
+
+`.github/workflows/build-windows.yml` used to zip up the raw
+`flutter build windows` output (exe + a pile of DLLs + a `data\`
+folder) — not something to hand a non-technical client. It now
+compiles `windows/installer/temidove_crm.iss` with Inno Setup (ships
+preinstalled on `windows-latest` runners; the workflow falls back to a
+Chocolatey install if a future runner image ever drops it) into a
+single `TemidoveCRM-Setup.exe` — proper Start Menu/Desktop shortcuts,
+an uninstaller, and the installer version pulled straight from
+`pubspec.yaml` so it can't drift from the app's own version. The
+uninstaller deliberately does **not** touch the per-user AppData
+SQLite file (see the comment in the `.iss`) — re-installing to upgrade
+must never silently wipe live student/payment data.
 
 Deliberately NOT built, by design decision rather than oversight:
 
-1. **Auth / login screen.** `Staff.passwordHash` exists in the schema
-   and the CSV importer carries over the old app's bcrypt hashes
-   as-is (never decoded, never re-hashed) so they're preserved if this
-   is revisited — but no login screen or session handling exists. This
-   was an open question at handoff ("does v1 need login given each
-   staff PC has its own local database?") and nothing since has settled
-   it either way — **still confirm with the client before shipping**.
-2. **Reports/export.** Mentioned in planning as a nice-to-have
+1. **Reports/export.** Mentioned in planning as a nice-to-have
    (accountant-facing Excel/PDF export) — not started, not urgent for
    v1.
 
@@ -162,9 +250,9 @@ Deliberately NOT built, by design decision rather than oversight:
   Batch per unique combination, priced at the department's standard
   fee — see `csv_legacy_importer.dart` — as a reasonable default given
   this was never resolved.)
-- Does v1 need a login screen at all, given each staff PC will (for
-  now) have its own local database? Still unresolved — see "Current
-  state" above.
+- Should non-admin staff be restricted from anything beyond Staff/
+  Import (e.g. should they see every student, or only ones assigned to
+  them)? Not restricted currently — see "Auth" in "Current state".
 - The Excel importer has now been exercised structurally (parse →
   preview → commit) but still only against the one sample file from
   handoff. **Get 2-3 more real filled-in batch trackers from the
@@ -179,6 +267,10 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run -d windows
 ```
 
-CI builds a release zip on every push to `main` and publishes a
+First launch on a fresh install shows a "create administrator account"
+screen instead of the app — that's expected, not a bug (see "Auth").
+
+CI builds `TemidoveCRM-Setup.exe` (a single Inno Setup installer, see
+"Installer" above) on every push to `main` and publishes it as a
 GitHub Release on version tags (`git tag v0.1.0 && git push --tags`) —
 see `.github/workflows/build-windows.yml`.

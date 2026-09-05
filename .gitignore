@@ -18,6 +18,7 @@ pubspec.lock
 # Windows build outputs
 windows/flutter/ephemeral/
 build/windows/
+installer_output/
 
 # Local DB files (never commit real student/payment data)
 *.sqlite

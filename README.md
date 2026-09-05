@@ -19,17 +19,20 @@ flutter run -d windows
 
 ## Status
 
-Core v1 feature set is built: department/batch/student drill-down,
-student detail with payment history, payment reminders + recording,
-and both legacy-data import paths (Excel batch trackers and CSV exports
-of the old PHP app's tables) commit to the database. Auth and
-reports/export are deliberately deferred — see "Current state" in
+Core v1 feature set is built: a dashboard overview, department/batch/
+student drill-down, student detail with payment history, payment
+reminders + recording, admin-gated login (an admin account added on
+first run controls who else gets access), a full modern UI/branding
+pass, and both legacy-data import paths (Excel batch trackers and CSV
+exports of the old PHP app's tables) commit to the database.
+Reports/export is deliberately deferred — see "Current state" in
 `CLAUDE.md` for the full picture and open questions to confirm with
 the client before shipping.
 
 ## CI
 
-Every push to `main` builds a Windows release zip
-(`.github/workflows/build-windows.yml`), downloadable from the Actions
-tab. Pushing a version tag (e.g. `v0.1.0`) additionally publishes a
-GitHub Release with the zip attached.
+Every push to `main` builds a single Windows installer
+(`TemidoveCRM-Setup.exe`, via `.github/workflows/build-windows.yml`),
+downloadable from the Actions tab. Pushing a version tag (e.g.
+`v0.1.0`) additionally publishes a GitHub Release with the installer
+attached.

@@ -77,7 +77,8 @@ class ExcelImportCommitter {
           result.studentsMatched++;
         } else {
           studentId = _uuid.v4();
-          final nameParts = (row.name ?? 'Unknown').trim().split(RegExp(r'\s+'));
+          final nameParts =
+              (row.name ?? 'Unknown').trim().split(RegExp(r'\s+'));
           await db.studentDao.upsert(StudentsCompanion.insert(
             id: studentId,
             firstName: nameParts.first,

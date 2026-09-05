@@ -96,9 +96,9 @@ class PaymentDao extends DatabaseAccessor<AppDatabase> with _$PaymentDaoMixin {
     String? agentPhone,
     String? notes,
   }) async {
-    final existing =
-        await (select(payments)..where((p) => p.id.equals(paymentId)))
-            .getSingle();
+    final existing = await (select(payments)
+          ..where((p) => p.id.equals(paymentId)))
+        .getSingle();
     final newPaid = existing.paidAmount + amountPaid;
     final newStatus = newPaid >= existing.expectedAmount ? 'paid' : 'partial';
 

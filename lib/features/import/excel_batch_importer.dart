@@ -78,7 +78,8 @@ class ParsedMonthPayment {
 
 class ParsedBatchSheet {
   final String sheetName;
-  final String? batchLabel; // from the "Batch: ..." line, e.g. "Ruth_Prelevel_Batch_4"
+  final String?
+      batchLabel; // from the "Batch: ..." line, e.g. "Ruth_Prelevel_Batch_4"
   final double? monthlyFee; // parsed out of "Payment: 50,000 per month"
   final List<ParsedStudentRow> students;
   final List<String> warnings;
@@ -158,7 +159,8 @@ class ExcelBatchImporter {
     final students = <ParsedStudentRow>[];
     for (var i = headerRowIndex + 1; i < rows.length; i++) {
       final row = rows[i];
-      final firstCell = (row.isNotEmpty ? row[0]?.value?.toString() : null) ?? '';
+      final firstCell =
+          (row.isNotEmpty ? row[0]?.value?.toString() : null) ?? '';
       if (firstCell.trim().toUpperCase() == 'TOTALS') break; // end of table
       if (firstCell.trim().toUpperCase() == 'LEGEND:') break;
 
@@ -208,7 +210,8 @@ class ExcelBatchImporter {
         } else {
           result['phone']!.add(i);
         }
-      } else if (h.contains('agenc') && (h.contains('no') || h.contains('number'))) {
+      } else if (h.contains('agenc') &&
+          (h.contains('no') || h.contains('number'))) {
         result['agent_phone']!.add(i);
       } else if (h.contains('agenc')) {
         result['agent_name']!.add(i);
@@ -256,8 +259,7 @@ class ExcelBatchImporter {
           m + 1 < dueDateCols.length ? dueDateCols[m + 1] : row.length;
 
       int? findInRange(List<int> candidates) {
-        final matches =
-            candidates.where((c) => c > dueCol && c < nextBoundary);
+        final matches = candidates.where((c) => c > dueCol && c < nextBoundary);
         return matches.isEmpty ? null : matches.first;
       }
 
@@ -273,11 +275,14 @@ class ExcelBatchImporter {
 
     return ParsedStudentRow(
       name: cellStr(colIndex['name']!.isNotEmpty ? colIndex['name']![0] : null),
-      phone: cellStr(colIndex['phone']!.isNotEmpty ? colIndex['phone']![0] : null),
-      startDate: cellDate(
-          colIndex['start_date']!.isNotEmpty ? colIndex['start_date']![0] : null),
+      phone:
+          cellStr(colIndex['phone']!.isNotEmpty ? colIndex['phone']![0] : null),
+      startDate: cellDate(colIndex['start_date']!.isNotEmpty
+          ? colIndex['start_date']![0]
+          : null),
       months: months,
-      notes: cellStr(colIndex['notes']!.isNotEmpty ? colIndex['notes']![0] : null),
+      notes:
+          cellStr(colIndex['notes']!.isNotEmpty ? colIndex['notes']![0] : null),
     );
   }
 
