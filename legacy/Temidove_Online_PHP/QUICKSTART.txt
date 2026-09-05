@@ -1,0 +1,121 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║         TEMIDOVE SMART SOLUTIONS - QUICK START GUIDE                      ║
+║              5-Minute Setup for Your Local WAMP Server                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+STEP 1: Extract Files
+─────────────────────
+• Copy all files to: C:\wamp64\www\temidove
+• If folder doesn't exist, create it
+
+STEP 2: Start WAMP
+──────────────────
+• Click WAMP icon in system tray
+• Click "Start All Services"
+• Wait for icon to turn green ✓
+
+STEP 3: Create Database (2 options)
+───────────────────────────────────
+
+OPTION A (Easiest - phpMyAdmin):
+1. Open browser → http://localhost/phpmyadmin
+2. Click "Databases" tab
+3. Enter database name: temidove_db → Click Create
+4. Click on temidove_db → Click "Import" tab
+5. Choose file → Select "temidove_database.sql"
+6. Click Import ✓
+
+OPTION B (Command Line):
+1. Open Command Prompt
+2. Navigate to: C:\wamp64\bin\mysql\mysql5.7.31\bin
+3. Run: mysql -u root -p
+4. Press Enter (no password needed)
+5. Copy-paste these commands:
+   ─────────────────────────────────────
+   CREATE DATABASE temidove_db;
+   USE temidove_db;
+   SOURCE C:/wamp64/www/temidove/temidove_database.sql;
+   ─────────────────────────────────────
+6. Press Enter ✓
+
+STEP 4: Access Your Website
+─────────────────────────────
+Open your browser and visit:
+
+📍 http://localhost/temidove/
+
+You should see the beautiful Temidove home page!
+
+STEP 5: Test the System
+────────────────────────
+
+A) Test Public Registration:
+   • Click "Inquire Now" button
+   • Fill out course inquiry form
+   • Submit and verify success message
+
+B) Test Admin Dashboard:
+   • Click "Staff Login" 
+   • Username: admin
+   • Password: admin123
+   • Verify your inquiry appears in dashboard
+
+C) Test Dashboard Features:
+   • Click stat cards to filter by status
+   • Change status dropdowns
+   • Click eye icon to view details
+   • Click pencil icon to edit/assign
+
+DONE! 🎉
+─────────
+
+Your Temidove Smart Solutions system is now live!
+
+IMPORTANT URLS
+──────────────
+Home Page:      http://localhost/temidove/
+Student Form:   http://localhost/temidove/register.php
+Staff Login:    http://localhost/temidove/login.php
+Dashboard:      http://localhost/temidove/dashboard.php (after login)
+phpMyAdmin:     http://localhost/phpmyadmin
+
+DEFAULT CREDENTIALS
+────────────────────
+Username: admin
+Password: admin123
+
+⚠️  CHANGE THESE AFTER FIRST LOGIN!
+
+NEXT STEPS
+──────────
+1. Change admin password (See README.md for details)
+2. Add your staff members in phpMyAdmin
+3. Share register.php link with clients
+4. Check dashboard daily for new inquiries
+
+TROUBLESHOOTING
+────────────────
+❌ Site won't load?
+   → Check WAMP icon is green
+   → Check folder is in correct location
+   → Try clearing browser cache
+
+❌ Database error?
+   → Verify temidove_db exists in phpMyAdmin
+   → Check database import completed
+   → Restart WAMP
+
+❌ Login fails?
+   → Verify username/password
+   → Check admin user exists in database
+   → Try private/incognito browser
+
+For detailed setup guide, see README.md
+For customization help, see README.md sections
+
+Questions? Check the full README.md file for detailed troubleshooting.
+
+═══════════════════════════════════════════════════════════════════════════════
+Built with ❤️ for Temidove Smart Solutions
+Version 1.0 | Compatible with WAMP64/WAMP32
+═══════════════════════════════════════════════════════════════════════════════

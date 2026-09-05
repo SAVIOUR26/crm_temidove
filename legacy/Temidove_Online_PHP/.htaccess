@@ -1,0 +1,43 @@
+# Temidove Smart Solutions - Apache Configuration
+
+# Enable mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /Projects/Temidove_Online/
+</IfModule>
+
+# Disable access to hidden files
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Protect sensitive files
+<FilesMatch "\.(sql|env|config)$">
+    Require all denied
+</FilesMatch>
+
+# Set character encoding
+AddDefaultCharset UTF-8
+
+# Set cache headers for static files
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+
+    # Set no-cache for dynamic files
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    </FilesMatch>
+
+    # Security headers
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Redirect HTTP to HTTPS (enable only after SSL is configured)
+# <IfModule mod_rewrite.c>
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>

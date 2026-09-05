@@ -1,0 +1,46 @@
+name: temidove_crm
+description: Offline-first CRM for Temidove Smart Solutions — student inquiries, batch enrollment, and payment tracking, replacing the legacy PHP dashboard and Excel payment trackers.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Local relational database (SQLite via Drift) — source of truth for offline operation.
+  drift: ^2.20.0
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.1.0
+  path: ^1.9.0
+
+  # IDs, dates, formatting
+  uuid: ^4.4.0
+  intl: ^0.19.0
+
+  # Legacy data import
+  excel: ^4.0.0          # pure-Dart .xlsx reader, used by the batch-tracker importer
+  file_picker: ^8.0.0    # let staff pick the legacy .sql / .xlsx files to import
+
+  # Payment reminders — opens WhatsApp Desktop / web with a pre-filled message
+  url_launcher: ^6.3.0
+
+  # Simple state management for the app shell
+  provider: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  drift_dev: ^2.20.0
+  build_runner: ^2.4.0
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+# NOTE for whoever picks this up (Claude Code): pin versions to whatever's
+# current when you run `flutter pub get` — these were current as of early
+# 2026 knowledge and may have moved on. Run `flutter pub outdated` and bump
+# before writing new code against these packages.

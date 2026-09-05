@@ -1,0 +1,370 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║     TEMIDOVE SMART SOLUTIONS - COMPLETE FILE GUIDE                     ║
+║              Full-Stack PHP Application for Course Management           ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+📁 PROJECT FILES OVERVIEW
+═════════════════════════════════════════════════════════════════════════════
+
+CONFIGURATION FILES
+───────────────────
+
+1. 📄 config.php
+   ├─ Purpose: Database connection and configuration
+   ├─ Contains: MySQL connection settings, session management
+   ├─ When accessed: On every page load (included in all files)
+   └─ Edit if: Changing database name or credentials
+
+2. 📄 .htaccess
+   ├─ Purpose: Apache server configuration
+   ├─ Contains: URL rewriting, security headers, caching rules
+   ├─ Location: Root folder (already set up)
+   └─ Note: Requires Apache mod_rewrite enabled
+
+3. 📄 temidove_database.sql
+   ├─ Purpose: Database structure and initial data
+   ├─ Contains: Table definitions, sample courses, default admin user
+   ├─ How to use: Import via phpMyAdmin
+   └─ Size: Small (~5 KB)
+
+
+PUBLIC-FACING PAGES (No login required)
+───────────────────────────────────────
+
+4. 📄 index.php (HOME PAGE)
+   ├─ URL: http://localhost/temidove/
+   ├─ Purpose: Main landing/marketing page
+   ├─ Features:
+   │  ├─ Navigation menu
+   │  ├─ Hero section with call-to-actions
+   │  ├─ Course showcase (featured courses)
+   │  ├─ Features section
+   │  └─ Professional footer
+   ├─ Includes: Responsive design, brand colors
+   └─ What it shows: Overview of Temidove and available courses
+
+5. 📄 register.php (REGISTRATION FORM)
+   ├─ URL: http://localhost/temidove/register.php
+   ├─ Purpose: Public course inquiry form
+   ├─ Features:
+   │  ├─ Client registration form
+   │  ├─ Course selection with details
+   │  ├─ Email validation
+   │  ├─ Instant success confirmation
+   │  └─ Responsive mobile-friendly design
+   ├─ Data saved to: registrations table
+   └─ Who uses it: Prospective students
+
+
+STAFF/ADMIN PAGES (Login required)
+──────────────────────────────────
+
+6. 📄 login.php
+   ├─ URL: http://localhost/temidove/login.php
+   ├─ Purpose: Staff and admin authentication
+   ├─ Features:
+   │  ├─ Secure password verification
+   │  ├─ Session management
+   │  ├─ Demo credentials display
+   │  └─ Professional login interface
+   ├─ Default login: admin / admin123
+   └─ Redirects to: dashboard.php after successful login
+
+7. 📄 dashboard.php (MAIN ADMIN INTERFACE)
+   ├─ URL: http://localhost/temidove/dashboard.php
+   ├─ Purpose: Central hub for managing all registrations
+   ├─ Features:
+   │  ├─ Real-time statistics cards
+   │  │  ├─ Total inquiries count
+   │  │  ├─ Waiting count (clickable filter)
+   │  │  ├─ Started count (clickable filter)
+   │  │  └─ Completed count (clickable filter)
+   │  ├─ Advanced filtering system
+   │  │  ├─ Search by name/email/phone
+   │  │  ├─ Filter by status (waiting/started/completed/cancelled)
+   │  │  └─ Filter by course
+   │  ├─ Registration table with:
+   │  │  ├─ Student details
+   │  │  ├─ Status dropdown (change status instantly)
+   │  │  ├─ Staff assignment
+   │  │  ├─ Inquiry date
+   │  │  └─ Action buttons
+   │  ├─ Detailed view modal (👁️ icon)
+   │  │  └─ Shows full student information
+   │  ├─ Edit modal (✏️ icon)
+   │  │  ├─ Assign to staff member
+   │  │  ├─ Add internal notes
+   │  │  └─ Set start date
+   │  └─ User session management
+   ├─ Data source: registrations table
+   └─ Permission: Admin and Staff roles
+
+8. 📄 logout.php
+   ├─ URL: http://localhost/temidove/logout.php
+   ├─ Purpose: End user session
+   ├─ Function: Destroys session and redirects to login
+   └─ Called from: Logout button in navbar
+
+
+UTILITY/SETUP FILES
+───────────────────
+
+9. 📄 check.php (SYSTEM VERIFICATION)
+   ├─ URL: http://localhost/temidove/check.php
+   ├─ Purpose: Verify installation and system requirements
+   ├─ Checks:
+   │  ├─ PHP version (7.4+)
+   │  ├─ Required extensions (mysqli, json, session)
+   │  ├─ File accessibility
+   │  ├─ Database connection
+   │  ├─ Database tables
+   │  └─ System information
+   ├─ Displays: Visual dashboard of system status
+   └─ Use: Run after initial setup to verify everything works
+
+10. 📄 README.md (FULL DOCUMENTATION)
+    ├─ Size: Comprehensive guide (~400 lines)
+    ├─ Contains:
+    │  ├─ Features overview
+    │  ├─ System requirements
+    │  ├─ Installation steps (detailed)
+    │  ├─ Configuration guide
+    │  ├─ Troubleshooting section
+    │  ├─ Database schema
+    │  ├─ Customization guide
+    │  ├─ Security notes
+    │  └─ Technical specifications
+    └─ Best for: Detailed reference and advanced configuration
+
+11. 📄 QUICKSTART.txt (QUICK START GUIDE)
+    ├─ Format: Plain text with ASCII formatting
+    ├─ Length: ~150 lines (quick read)
+    ├─ Provides:
+    │  ├─ 5-minute setup steps
+    │  ├─ Two database setup options
+    │  ├─ Important URLs
+    │  ├─ Default credentials
+    │  ├─ Quick troubleshooting
+    │  └─ Next steps after setup
+    └─ Best for: First-time installation
+
+12. 📄 FILES_GUIDE.txt (This file!)
+    ├─ Purpose: Explain each file and its purpose
+    ├─ Organized by: File type and function
+    └─ Use: As reference during development
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+📊 DATABASE TABLES CREATED
+──────────────────────────────────────────────────────────────────────────────
+
+users table (Authentication)
+├─ id: Unique identifier
+├─ username: Login username (unique)
+├─ password: Hashed password (bcrypt)
+├─ email: User email (unique)
+├─ full_name: Staff member name
+└─ role: 'admin' or 'staff'
+
+courses table (Available Courses)
+├─ id: Unique course identifier
+├─ course_name: Course title
+├─ description: Course details
+├─ price: Course fee in UGX
+└─ duration_weeks: Course length
+
+registrations table (Student Inquiries)
+├─ id: Unique registration ID
+├─ first_name: Student's first name
+├─ last_name: Student's last name
+├─ email: Student email
+├─ phone: Contact phone
+├─ course_id: Foreign key to courses
+├─ status: 'waiting', 'started', 'completed', 'cancelled'
+├─ inquiry_date: When inquiry was submitted
+├─ assigned_to: Foreign key to users (staff assignment)
+├─ notes: Internal staff notes
+├─ start_date: When course started
+└─ created_at/updated_at: Timestamps
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+🔐 DEFAULT DATA IN DATABASE
+──────────────────────────────────────────────────────────────────────────────
+
+11 COURSES (automatically created):
+1. English Language
+2. Advanced Computer Skills
+3. Accounting
+4. Video Editing
+5. Graphics & Camera Shooting
+6. Art Painting
+7. Programming Languages
+8. Website Designing
+9. Digital Marketing
+10. Content Creation
+11. Business Management
+
+SAMPLE STAFF USERS:
+├─ admin (Admin User)
+│  └─ Password: admin123 (change immediately!)
+├─ instructor1 (Sample Staff)
+│  └─ Password: admin123
+└─ instructor2 (Sample Staff)
+   └─ Password: admin123
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+🎨 DESIGN & STYLING
+────────────────────────────────────────────────────────────────────────────
+
+Brand Colors (From Temidove Logo):
+├─ Primary Blue: #1e3a8a
+├─ Cyan/Accent: #06b6d4
+├─ Light Gray: #f0f4f8
+└─ Dark Blue: #0f172a
+
+All CSS is:
+├─ Inline in PHP files
+├─ Responsive (mobile, tablet, desktop)
+├─ No external dependencies
+├─ Professional and modern
+└─ Fully branded with Temidove colors
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+🚀 GETTING STARTED WORKFLOW
+────────────────────────────────────────────────────────────────────────────
+
+1. INSTALLATION (First Time)
+   └─ Extract files → Start WAMP → Create database → Access website
+
+2. VERIFICATION
+   └─ Go to http://localhost/temidove/check.php
+
+3. TESTING
+   └─ Test register.php form → Test login → Test dashboard
+
+4. CUSTOMIZATION (Optional)
+   └─ Change admin password → Add staff → Update courses
+
+5. DEPLOYMENT
+   └─ Share register.php link with clients → Monitor dashboard daily
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+📝 FILE SIZES REFERENCE
+────────────────────────────────────────────────────────────────────────────
+
+config.php .......................... ~2.5 KB
+index.php ........................... ~8 KB
+login.php ........................... ~6 KB
+register.php ........................ ~9 KB
+dashboard.php ....................... ~20 KB
+logout.php .......................... ~0.2 KB
+check.php ........................... ~8 KB
+.htaccess ........................... ~2 KB
+temidove_database.sql ............... ~5 KB
+README.md ........................... ~15 KB
+QUICKSTART.txt ...................... ~5 KB
+FILES_GUIDE.txt (this file) ......... ~8 KB
+                                  ─────────
+TOTAL                             ~87 KB
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+✓ WHAT'S INCLUDED IN THIS PACKAGE
+──────────────────────────────────────────────────────────────────────────────
+
+✓ Complete registration system
+✓ Professional admin dashboard
+✓ Database structure (ready to import)
+✓ User authentication system
+✓ Status tracking (waiting/started)
+✓ Staff assignment functionality
+✓ Search & filter capabilities
+✓ Responsive mobile-friendly design
+✓ Temidove brand integration
+✓ System check utility
+✓ Comprehensive documentation
+✓ Quick start guide
+✓ No external dependencies (pure PHP)
+✓ Works on Windows, Mac, Linux WAMP servers
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+❌ NOT INCLUDED (But you can add)
+──────────────────────────────────────────────────────────────────────────────
+
+• Email notifications (can be added to register.php)
+• File uploads (attachments, documents)
+• Payment processing
+• Certificate generation
+• Advanced reporting/analytics
+• Email reminders to students
+• SMS notifications
+• Video hosting integration
+• Learning management system (LMS)
+• Student portal login
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+💡 QUICK REFERENCE COMMANDS
+────────────────────────────────────────────────────────────────────────────
+
+Access the site:
+► http://localhost/temidove/
+
+Check installation:
+► http://localhost/temidove/check.php
+
+Student registration:
+► http://localhost/temidove/register.php
+
+Staff login:
+► http://localhost/temidove/login.php
+
+Database management:
+► http://localhost/phpmyadmin
+
+Change admin password (in phpMyAdmin):
+1. Navigate to users table
+2. Edit admin row
+3. Use this to generate hash:
+   <?php echo password_hash('newpassword', PASSWORD_BCRYPT); ?>
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+📞 SUPPORT & NEXT STEPS
+────────────────────────────────────────────────────────────────────────────
+
+For detailed setup:
+→ Read QUICKSTART.txt (5 minute guide)
+
+For comprehensive guide:
+→ Read README.md (complete documentation)
+
+For system verification:
+→ Go to http://localhost/temidove/check.php
+
+For questions about a specific file:
+→ See the description at the top of each .php file
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+Version: 1.0
+Last Updated: January 2024
+Built for: Temidove Smart Solutions
+Compatibility: WAMP64/WAMP32, PHP 7.4+, MySQL 5.7+
+
+═════════════════════════════════════════════════════════════════════════════
