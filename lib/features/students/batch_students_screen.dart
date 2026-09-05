@@ -96,7 +96,8 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => StudentDetailScreen(studentId: row.student.id),
+                    builder: (_) =>
+                        StudentDetailScreen(studentId: row.student.id),
                   ),
                 ),
               );
@@ -178,7 +179,8 @@ class _EnrollStudentDialogState extends State<_EnrollStudentDialog> {
                   ButtonSegment(value: false, label: Text('Existing student')),
                 ],
                 selected: {_isNewStudent},
-                onSelectionChanged: (s) => setState(() => _isNewStudent = s.first),
+                onSelectionChanged: (s) =>
+                    setState(() => _isNewStudent = s.first),
               ),
               const SizedBox(height: 12),
               if (_isNewStudent) ...[
@@ -197,7 +199,8 @@ class _EnrollStudentDialogState extends State<_EnrollStudentDialog> {
                 ),
                 TextField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email (optional)'),
+                  decoration:
+                      const InputDecoration(labelText: 'Email (optional)'),
                 ),
               ] else ...[
                 TextField(
@@ -222,7 +225,8 @@ class _EnrollStudentDialogState extends State<_EnrollStudentDialog> {
                         selected: selected,
                         title: Text('${s.firstName} ${s.lastName}'),
                         subtitle: Text(s.phone),
-                        trailing: selected ? const Icon(Icons.check_circle) : null,
+                        trailing:
+                            selected ? const Icon(Icons.check_circle) : null,
                         onTap: () => setState(() => _selectedExisting = s),
                       );
                     },
@@ -272,7 +276,8 @@ class _EnrollStudentDialogState extends State<_EnrollStudentDialog> {
               if (_selectedExisting == null) return;
               Navigator.pop(
                 context,
-                _EnrollFormResult.existing(_selectedExisting, customFee: customFee),
+                _EnrollFormResult.existing(_selectedExisting,
+                    customFee: customFee),
               );
             }
           },

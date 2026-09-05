@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.temidove" "\0"
-            VALUE "FileDescription", "temidove_crm" "\0"
+            VALUE "CompanyName", "Temidove Smart Solutions" "\0"
+            VALUE "FileDescription", "Temidove CRM" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "temidove_crm" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.temidove. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Temidove Smart Solutions. All rights reserved." "\0"
             VALUE "OriginalFilename", "temidove_crm.exe" "\0"
-            VALUE "ProductName", "temidove_crm" "\0"
+            VALUE "ProductName", "Temidove CRM" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

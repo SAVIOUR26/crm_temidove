@@ -31,7 +31,8 @@ class ReminderService {
     required BatchData batch,
     required Payment payment,
   }) {
-    final amount = _currency.format(payment.expectedAmount - payment.paidAmount);
+    final amount =
+        _currency.format(payment.expectedAmount - payment.paidAmount);
     final due = _dateFmt.format(payment.dueDate);
     final isOverdue = payment.dueDate.isBefore(DateTime.now());
 

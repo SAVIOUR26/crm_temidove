@@ -153,7 +153,8 @@ class CsvLegacyImporter {
     final passwordCol = table.colIndex(['password']);
 
     if (usernameCol == null) {
-      summary.warnings.add('users.csv: no "username" column found — skipped entirely.');
+      summary.warnings
+          .add('users.csv: no "username" column found — skipped entirely.');
       return;
     }
 
@@ -213,7 +214,8 @@ class CsvLegacyImporter {
       if (firstName == null || firstName.isEmpty) continue;
 
       final oldCourseId = _cell(row, courseIdCol);
-      final departmentId = oldCourseId != null ? courseIdToDepartmentId[oldCourseId] : null;
+      final departmentId =
+          oldCourseId != null ? courseIdToDepartmentId[oldCourseId] : null;
       if (departmentId == null) {
         summary.warnings.add(
             '$firstName ${_cell(row, lastNameCol) ?? ""}: course_id "$oldCourseId" not found among imported courses — student skipped.');
@@ -244,8 +246,8 @@ class CsvLegacyImporter {
         phone: phone ?? '',
         email: Value(_cell(row, emailCol)),
         status: Value(_cell(row, statusCol) ?? 'waiting'),
-        assignedStaffId:
-            Value(oldAssignedTo != null ? userIdToStaffId[oldAssignedTo] : null),
+        assignedStaffId: Value(
+            oldAssignedTo != null ? userIdToStaffId[oldAssignedTo] : null),
         notes: Value(_cell(row, notesCol)),
       ));
       summary.studentsCreated++;
@@ -287,7 +289,8 @@ class _CsvLegacyImportDialogState extends State<CsvLegacyImportDialog> {
   bool _importing = false;
   LegacyImportSummary? _summary;
 
-  Future<void> _pick(void Function(String content, String name) onPicked) async {
+  Future<void> _pick(
+      void Function(String content, String name) onPicked) async {
     final picked = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv'],
@@ -370,7 +373,9 @@ class _CsvLegacyImportDialogState extends State<CsvLegacyImportDialog> {
                   },
             child: _importing
                 ? const SizedBox(
-                    width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2))
                 : const Text('Import'),
           ),
       ],
@@ -382,7 +387,8 @@ class _FilePickRow extends StatelessWidget {
   final String label;
   final String? fileName;
   final VoidCallback onPick;
-  const _FilePickRow({required this.label, required this.fileName, required this.onPick});
+  const _FilePickRow(
+      {required this.label, required this.fileName, required this.onPick});
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +397,9 @@ class _FilePickRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(width: 140, child: Text(label)),
-          Expanded(child: Text(fileName ?? 'not selected', overflow: TextOverflow.ellipsis)),
+          Expanded(
+              child: Text(fileName ?? 'not selected',
+                  overflow: TextOverflow.ellipsis)),
           TextButton(onPressed: onPick, child: const Text('Choose')),
         ],
       ),
@@ -415,7 +423,8 @@ class _SummaryView extends StatelessWidget {
         for (final w in summary.warnings)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text('⚠ $w', style: TextStyle(color: Colors.orange.shade800)),
+            child:
+                Text('⚠ $w', style: TextStyle(color: Colors.orange.shade800)),
           ),
       ],
     );

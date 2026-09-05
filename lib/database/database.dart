@@ -34,6 +34,7 @@ import 'daos/student_dao.dart';
 import 'daos/enrollment_dao.dart';
 import 'daos/payment_dao.dart';
 import 'daos/reminder_dao.dart';
+import 'daos/dashboard_dao.dart';
 
 // Re-export the DAOs' small result-holder classes (DepartmentWithBatchCount,
 // PaymentWithContext, etc.) so screens only need `import 'database.dart'`
@@ -45,6 +46,7 @@ export 'daos/student_dao.dart';
 export 'daos/enrollment_dao.dart';
 export 'daos/payment_dao.dart';
 export 'daos/reminder_dao.dart';
+export 'daos/dashboard_dao.dart';
 
 part 'database.g.dart';
 
@@ -52,10 +54,8 @@ part 'database.g.dart';
 /// id/createdAt/updatedAt/isDeleted on every table below.
 mixin SyncableColumns on Table {
   TextColumn get id => text()();
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
-  DateTimeColumn get updatedAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
 }
 
@@ -79,8 +79,7 @@ class Departments extends Table with SyncableColumns {
 // class (the batch-write helper used in DAOs' `batch((b) { ... })` calls).
 @DataClassName('BatchData')
 class Batches extends Table with SyncableColumns {
-  TextColumn get departmentId =>
-      text().references(Departments, #id)();
+  TextColumn get departmentId => text().references(Departments, #id)();
   TextColumn get instructorName => text().nullable()();
   // Free text on purpose — the PHP app hardcoded 6 levels as an ENUM,
   // which is exactly the kind of thing that breaks the first time a new
@@ -122,8 +121,7 @@ class Students extends Table with SyncableColumns {
   // waiting | started | completed | cancelled — same vocabulary as the
   // old dashboard so the mental model carries over for staff.
   TextColumn get status => text().withDefault(const Constant('waiting'))();
-  TextColumn get assignedStaffId =>
-      text().nullable().references(Staff, #id)();
+  TextColumn get assignedStaffId => text().nullable().references(Staff, #id)();
   TextColumn get notes => text().nullable()();
 
   @override
@@ -139,8 +137,7 @@ class Enrollments extends Table with SyncableColumns {
   // Overrides Batches.monthlyFee for this student only — discounts,
   // late joiners, custom arrangements. Null = use the batch's standard fee.
   RealColumn get customFee => real().nullable()();
-  DateTimeColumn get enrolledOn =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get enrolledOn => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get startDate => dateTime().nullable()();
 
   @override
@@ -178,8 +175,7 @@ class ReminderLog extends Table with SyncableColumns {
   TextColumn get paymentId => text().references(Payments, #id)();
   DateTimeColumn get sentAt => dateTime().withDefault(currentDateAndTime)();
   TextColumn get channel => text().withDefault(const Constant('whatsapp'))();
-  TextColumn get sentByStaffId =>
-      text().nullable().references(Staff, #id)();
+  TextColumn get sentByStaffId => text().nullable().references(Staff, #id)();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -203,6 +199,7 @@ class ReminderLog extends Table with SyncableColumns {
     EnrollmentDao,
     PaymentDao,
     ReminderDao,
+    DashboardDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

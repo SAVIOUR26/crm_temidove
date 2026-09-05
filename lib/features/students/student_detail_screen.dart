@@ -35,7 +35,8 @@ class StudentDetailScreen extends StatelessWidget {
             children: [
               _StudentHeader(student: student, db: db),
               const SizedBox(height: 24),
-              Text('Enrollments', style: Theme.of(context).textTheme.titleLarge),
+              Text('Enrollments',
+                  style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               StreamBuilder<List<EnrollmentWithBatch>>(
                 stream: db.enrollmentDao.watchForStudent(studentId),
@@ -116,7 +117,8 @@ class _StudentHeader extends StatelessWidget {
                                 child: Text(s.fullName),
                               )),
                         ],
-                        onChanged: (v) => db.studentDao.assignStaff(student.id, v),
+                        onChanged: (v) =>
+                            db.studentDao.assignStaff(student.id, v),
                       );
                     },
                   ),
@@ -218,7 +220,8 @@ class _PaymentTile extends StatelessWidget {
         backgroundColor: statusColor.shade100,
         child: Icon(Icons.circle, size: 10, color: statusColor.shade800),
       ),
-      title: Text('Due ${dateFmt.format(payment.dueDate)} · ${currency.format(payment.expectedAmount)}'),
+      title: Text(
+          'Due ${dateFmt.format(payment.dueDate)} · ${currency.format(payment.expectedAmount)}'),
       subtitle: Text(status == 'paid'
           ? 'Paid ${payment.datePaid != null ? dateFmt.format(payment.datePaid!) : ""}'
           : '$status · ${currency.format(balance)} outstanding'),

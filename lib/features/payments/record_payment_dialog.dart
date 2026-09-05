@@ -9,7 +9,8 @@ import '../../database/database.dart';
 class RecordPaymentDialog extends StatefulWidget {
   final AppDatabase db;
   final Payment payment;
-  const RecordPaymentDialog({super.key, required this.db, required this.payment});
+  const RecordPaymentDialog(
+      {super.key, required this.db, required this.payment});
 
   @override
   State<RecordPaymentDialog> createState() => _RecordPaymentDialogState();
@@ -51,13 +52,13 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
             ),
             TextField(
               controller: _agentPhoneController,
-              decoration:
-                  const InputDecoration(labelText: 'Agent phone'),
+              decoration: const InputDecoration(labelText: 'Agent phone'),
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text('Date paid: ${DateFormat('d MMM yyyy').format(_datePaid)}'),
+                Text(
+                    'Date paid: ${DateFormat('d MMM yyyy').format(_datePaid)}'),
                 TextButton(
                   onPressed: () async {
                     final picked = await showDatePicker(

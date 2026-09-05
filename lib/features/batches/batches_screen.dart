@@ -30,8 +30,8 @@ class _BatchesScreenState extends State<BatchesScreen> {
     final levelController = TextEditingController(text: existing?.level ?? '');
     final feeController =
         TextEditingController(text: existing?.monthlyFee.toString() ?? '');
-    final durationController = TextEditingController(
-        text: existing?.durationMonths.toString() ?? '3');
+    final durationController =
+        TextEditingController(text: existing?.durationMonths.toString() ?? '3');
     DateTime cycleStart = existing?.cycleStart ?? DateTime.now();
 
     final saved = await showDialog<bool>(
@@ -69,7 +69,8 @@ class _BatchesScreenState extends State<BatchesScreen> {
                 Row(
                   children: [
                     Expanded(
-                        child: Text('Cycle start: ${_dateFmt.format(cycleStart)}')),
+                        child: Text(
+                            'Cycle start: ${_dateFmt.format(cycleStart)}')),
                     TextButton(
                       onPressed: () async {
                         final picked = await showDatePicker(
@@ -113,8 +114,9 @@ class _BatchesScreenState extends State<BatchesScreen> {
       instructorName: Value(instructorController.text.trim().isEmpty
           ? null
           : instructorController.text.trim()),
-      level: Value(
-          levelController.text.trim().isEmpty ? null : levelController.text.trim()),
+      level: Value(levelController.text.trim().isEmpty
+          ? null
+          : levelController.text.trim()),
       cycleStart: Value(cycleStart),
       durationMonths: Value(int.tryParse(durationController.text) ?? 3),
       monthlyFee: Value(fee),

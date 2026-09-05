@@ -62,5 +62,7 @@ class EnrollmentWithBatch {
   final BatchData batch;
   final Department department;
   EnrollmentWithBatch(
-      {required this.enrollment, required this.batch, required this.department});
+      {required this.enrollment,
+      required this.batch,
+      required this.department});
 }

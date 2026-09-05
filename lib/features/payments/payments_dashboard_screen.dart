@@ -129,15 +129,15 @@ class _PaymentRow extends StatelessWidget {
 
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: isOverdue
-            ? Colors.red.shade100
-            : Colors.amber.shade100,
+        backgroundColor:
+            isOverdue ? Colors.red.shade100 : Colors.amber.shade100,
         child: Icon(
           isOverdue ? Icons.warning_amber : Icons.schedule,
           color: isOverdue ? Colors.red.shade800 : Colors.amber.shade800,
         ),
       ),
-      title: Text('${paymentContext.student.firstName} ${paymentContext.student.lastName}'),
+      title: Text(
+          '${paymentContext.student.firstName} ${paymentContext.student.lastName}'),
       subtitle: Text(
         '${paymentContext.batch.level ?? "—"} · due ${dateFmt.format(payment.dueDate)} '
         '· ${currency.format(balance)} outstanding',

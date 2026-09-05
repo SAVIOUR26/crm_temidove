@@ -1,19 +1,20 @@
+import 'package:bcrypt/bcrypt.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../database/database.dart';
+import '../../theme/app_colors.dart';
 
 const _uuid = Uuid();
 const _roles = ['staff', 'admin'];
 
-/// Staff/instructor roster. Note: this manages the Staff table used for
-/// assigning students to a staff member and naming batch instructors —
-/// it does NOT include a login screen. Per /CLAUDE.md, whether v1 needs
-/// auth at all is still an open question for the client (each staff PC
-/// having its own local database may make it unnecessary); passwordHash
-/// stays unset here until that's decided.
+/// Staff/instructor roster and credential management. Reachable only by
+/// an admin (gated in app_shell.dart) — this is the screen that resolves
+/// the client's "admin adds other staff" ask: every account created here
+/// gets a bcrypt-hashed password so it can sign in via
+/// lib/features/auth/login_screen.dart.
 class StaffScreen extends StatelessWidget {
   const StaffScreen({super.key});
 
@@ -22,36 +23,55 @@ class StaffScreen extends StatelessWidget {
     AppDatabase db, {
     StaffData? existing,
   }) async {
-    final fullNameController = TextEditingController(text: existing?.fullName ?? '');
-    final usernameController = TextEditingController(text: existing?.username ?? '');
+    final fullNameController =
+        TextEditingController(text: existing?.fullName ?? '');
+    final usernameController =
+        TextEditingController(text: existing?.username ?? '');
+    final passwordController = TextEditingController();
     String role = existing?.role ?? 'staff';
+    String? error;
 
     final saved = await showDialog<bool>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: Text(existing == null ? 'Add staff' : 'Edit staff'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: fullNameController,
-                decoration: const InputDecoration(labelText: 'Full name'),
-                autofocus: true,
-              ),
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-              ),
-              DropdownButtonFormField<String>(
-                initialValue: role,
-                decoration: const InputDecoration(labelText: 'Role'),
-                items: _roles
-                    .map((r) => DropdownMenuItem(value: r, child: Text(r)))
-                    .toList(),
-                onChanged: (v) => setDialogState(() => role = v ?? role),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: fullNameController,
+                  decoration: const InputDecoration(labelText: 'Full name'),
+                  autofocus: true,
+                ),
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                ),
+                DropdownButtonFormField<String>(
+                  initialValue: role,
+                  decoration: const InputDecoration(labelText: 'Role'),
+                  items: _roles
+                      .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                      .toList(),
+                  onChanged: (v) => setDialogState(() => role = v ?? role),
+                ),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: existing == null
+                        ? 'Password'
+                        : 'New password (leave blank to keep current)',
+                  ),
+                ),
+                if (error != null) ...[
+                  const SizedBox(height: 8),
+                  Text(error!, style: const TextStyle(color: AppColors.danger)),
+                ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -59,7 +79,20 @@ class StaffScreen extends StatelessWidget {
               child: const Text('Cancel'),
             ),
             FilledButton(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () {
+                if (existing == null && passwordController.text.length < 6) {
+                  setDialogState(
+                      () => error = 'Password must be at least 6 characters.');
+                  return;
+                }
+                if (passwordController.text.isNotEmpty &&
+                    passwordController.text.length < 6) {
+                  setDialogState(
+                      () => error = 'Password must be at least 6 characters.');
+                  return;
+                }
+                Navigator.pop(context, true);
+              },
               child: const Text('Save'),
             ),
           ],
@@ -73,11 +106,15 @@ class StaffScreen extends StatelessWidget {
       return;
     }
 
+    final newPassword = passwordController.text;
     await db.staffDao.upsert(StaffCompanion(
       id: Value(existing?.id ?? _uuid.v4()),
       fullName: Value(fullNameController.text.trim()),
       username: Value(usernameController.text.trim()),
       role: Value(role),
+      passwordHash: newPassword.isEmpty
+          ? const Value.absent()
+          : Value(BCrypt.hashpw(newPassword, BCrypt.gensalt())),
       updatedAt: Value(DateTime.now()),
     ));
   }
@@ -109,6 +146,16 @@ class StaffScreen extends StatelessWidget {
             itemBuilder: (context, i) {
               final s = staff[i];
               return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor:
+                      AppColors.primaryBlue.withValues(alpha: 0.12),
+                  child: Text(
+                    s.fullName.isEmpty ? '?' : s.fullName[0].toUpperCase(),
+                    style: const TextStyle(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ),
                 title: Text(s.fullName),
                 subtitle: Text('@${s.username}'),
                 trailing: Chip(label: Text(s.role)),

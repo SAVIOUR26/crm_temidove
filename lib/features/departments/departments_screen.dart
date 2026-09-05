@@ -97,8 +97,9 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
     await db.departmentDao.upsert(DepartmentsCompanion(
       id: Value(existing?.id ?? _uuid.v4()),
       name: Value(name),
-      description: Value(
-          descController.text.trim().isEmpty ? null : descController.text.trim()),
+      description: Value(descController.text.trim().isEmpty
+          ? null
+          : descController.text.trim()),
       standardPrice: Value(double.tryParse(priceController.text) ?? 0),
       durationWeeks: Value(int.tryParse(weeksController.text)),
       updatedAt: Value(DateTime.now()),
@@ -124,7 +125,8 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
           final items = snapshot.data!;
           if (items.isEmpty) {
             return const Center(
-              child: Text('No departments yet — import legacy data or add one.'),
+              child:
+                  Text('No departments yet — import legacy data or add one.'),
             );
           }
           return GridView.builder(

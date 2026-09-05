@@ -89,8 +89,7 @@ class _ImportScreenState extends State<ImportScreen> {
                 child: ListView.separated(
                   itemCount: _results!.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, i) =>
-                      _SheetCommitCard(
+                  itemBuilder: (context, i) => _SheetCommitCard(
                     sheet: _results![i],
                     committed: _committed.contains(i),
                     onCommitted: () => setState(() => _committed.add(i)),
@@ -121,8 +120,8 @@ class _SheetCommitCard extends StatefulWidget {
 
 class _SheetCommitCardState extends State<_SheetCommitCard> {
   String? _departmentId;
-  late final _feeController =
-      TextEditingController(text: widget.sheet.monthlyFee?.toStringAsFixed(0) ?? '');
+  late final _feeController = TextEditingController(
+      text: widget.sheet.monthlyFee?.toStringAsFixed(0) ?? '');
   late final _durationController = TextEditingController(
     text: _maxMonths(widget.sheet).toString(),
   );
@@ -171,9 +170,12 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
       departmentId: _departmentId!,
       monthlyFee: fee,
       durationMonths: duration,
-      instructorName:
-          _instructorController.text.trim().isEmpty ? null : _instructorController.text.trim(),
-      level: _levelController.text.trim().isEmpty ? null : _levelController.text.trim(),
+      instructorName: _instructorController.text.trim().isEmpty
+          ? null
+          : _instructorController.text.trim(),
+      level: _levelController.text.trim().isEmpty
+          ? null
+          : _levelController.text.trim(),
     );
     setState(() {
       _committing = false;
@@ -193,13 +195,15 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(sheet.sheetName, style: Theme.of(context).textTheme.titleMedium),
+            Text(sheet.sheetName,
+                style: Theme.of(context).textTheme.titleMedium),
             Text('Batch label: ${sheet.batchLabel ?? "unknown"} · '
                 '${sheet.students.length} student rows parsed'),
             for (final w in sheet.warnings)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text('⚠ $w', style: TextStyle(color: Colors.orange.shade800)),
+                child: Text('⚠ $w',
+                    style: TextStyle(color: Colors.orange.shade800)),
               ),
             const Divider(height: 24),
             if (_result != null)
@@ -217,9 +221,11 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
                         final departments = snapshot.data ?? [];
                         return DropdownButtonFormField<String>(
                           initialValue: _departmentId,
-                          decoration: const InputDecoration(labelText: 'Department'),
+                          decoration:
+                              const InputDecoration(labelText: 'Department'),
                           items: departments
-                              .map((d) => DropdownMenuItem(value: d.id, child: Text(d.name)))
+                              .map((d) => DropdownMenuItem(
+                                  value: d.id, child: Text(d.name)))
                               .toList(),
                           onChanged: (v) => setState(() => _departmentId = v),
                         );
@@ -230,7 +236,8 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
                   Expanded(
                     child: TextField(
                       controller: _instructorController,
-                      decoration: const InputDecoration(labelText: 'Instructor'),
+                      decoration:
+                          const InputDecoration(labelText: 'Instructor'),
                     ),
                   ),
                 ],
@@ -248,7 +255,8 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
                   Expanded(
                     child: TextField(
                       controller: _feeController,
-                      decoration: const InputDecoration(labelText: 'Monthly fee (UGX)'),
+                      decoration:
+                          const InputDecoration(labelText: 'Monthly fee (UGX)'),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -256,7 +264,8 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
                   Expanded(
                     child: TextField(
                       controller: _durationController,
-                      decoration: const InputDecoration(labelText: 'Duration (months)'),
+                      decoration:
+                          const InputDecoration(labelText: 'Duration (months)'),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -266,7 +275,8 @@ class _SheetCommitCardState extends State<_SheetCommitCard> {
               Align(
                 alignment: Alignment.centerRight,
                 child: FilledButton.icon(
-                  onPressed: (_committing || _departmentId == null) ? null : _commit,
+                  onPressed:
+                      (_committing || _departmentId == null) ? null : _commit,
                   icon: _committing
                       ? const SizedBox(
                           width: 16,
@@ -308,7 +318,8 @@ class _CommitSummary extends StatelessWidget {
         for (final w in result.warnings)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text('⚠ $w', style: TextStyle(color: Colors.orange.shade800)),
+            child:
+                Text('⚠ $w', style: TextStyle(color: Colors.orange.shade800)),
           ),
       ],
     );

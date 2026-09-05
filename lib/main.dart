@@ -3,13 +3,17 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'database/database.dart';
+import 'features/auth/auth_state.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final db = AppDatabase();
   runApp(
-    Provider<AppDatabase>.value(
-      value: db,
+    MultiProvider(
+      providers: [
+        Provider<AppDatabase>.value(value: db),
+        ChangeNotifierProvider<AuthState>(create: (_) => AuthState(db)),
+      ],
       child: const TemidoveCrmApp(),
     ),
   );

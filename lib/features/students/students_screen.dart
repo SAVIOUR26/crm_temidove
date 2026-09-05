@@ -67,7 +67,8 @@ class _StudentsScreenState extends State<StudentsScreen> {
               ),
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email (optional)'),
+                decoration:
+                    const InputDecoration(labelText: 'Email (optional)'),
               ),
             ],
           ),
@@ -168,7 +169,8 @@ class _StudentsScreenState extends State<StudentsScreen> {
                 final students = snapshot.data!;
                 if (students.isEmpty) {
                   return const Center(
-                    child: Text('No students match — import legacy data or add one.'),
+                    child: Text(
+                        'No students match — import legacy data or add one.'),
                   );
                 }
                 return ListView.separated(
@@ -184,7 +186,8 @@ class _StudentsScreenState extends State<StudentsScreen> {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => StudentDetailScreen(studentId: s.id),
+                            builder: (_) =>
+                                StudentDetailScreen(studentId: s.id),
                           ),
                         );
                         _reload();
