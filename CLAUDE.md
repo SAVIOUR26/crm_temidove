@@ -72,50 +72,83 @@ nicer than Excel."
   parser still works** — see the TODO comments in that file for
   specifics.
 
-## Current state (as of handoff)
+## Current state (post-completion pass)
 
-Scaffolded, not finished. What exists:
+The v1 feature set described below is built and wired end-to-end. What
+exists:
 
-- Full Drift schema, all 7 tables (`lib/database/database.dart`).
+- Full Drift schema, all 7 tables (`lib/database/database.dart`). Note:
+  the `Batches` table's data class is `BatchData`, not `Batch` — it was
+  originally named `Batch` but that collides with drift's own `Batch`
+  helper class (used by `batch((b) { ... })` in the DAOs), which doesn't
+  show up until you actually compile. Keep this in mind if you add a new
+  table whose obvious data-class name shadows a drift/Dart built-in.
 - DAOs for all tables, with the payment-schedule-generation and
   overdue-status logic fully implemented
   (`lib/database/daos/payment_dao.dart` is the one to read most
-  carefully — it's the core business logic).
-- Reminder service (wa.me link building + send logging).
-- Excel batch-tracker importer: parses and previews, does **not** yet
-  write to the database (see the TODO in `import_screen.dart` for the
-  exact next step).
-- App shell with 4-tab navigation (Payments due / Departments /
-  Students / Import).
-- Departments screen: full grid, matches old `departments.php`.
-- Students screen: minimal list, no search/filter UI yet, no detail
-  view.
+  carefully — it's the core business logic), plus join-heavy read
+  methods (`EnrollmentDao.watchForBatch`/`watchForStudent`,
+  `PaymentDao.watchForEnrollment`) added to support the screens below.
+- Reminder service (wa.me link building + send logging), with a
+  "Record payment" action alongside "Remind" on both the payments
+  dashboard and the student detail screen
+  (`lib/features/payments/record_payment_dialog.dart`).
+- Excel batch-tracker importer: parses, previews, **and commits** —
+  `lib/features/import/excel_import_committer.dart` turns a confirmed
+  `ParsedBatchSheet` into real `Batches`/`Students`/`Enrollments`/
+  `Payments` rows once staff pick a department and confirm the
+  fee/duration in `ImportScreen`. Payments are written from each
+  month's actual due date/status/paid info in the sheet, not
+  regenerated from a fixed monthly cadence, so real payment history
+  survives the import.
+- CSV importer for the old PHP app's data
+  (`lib/features/import/csv_legacy_importer.dart`) — courses/users/
+  registrations exported as CSV (not parsed from the `.sql` dump; see
+  the file header for why) map to Departments/Staff/Students+Enrollments.
+  No payment data is fabricated from this path — the old app never
+  tracked fees (see `legacy/NOTES.md`).
+- App shell with 5-tab navigation (Payments due / Departments /
+  Students / Staff / Import).
+- Departments screen: full grid with add/edit, matches old
+  `departments.php`, tapping a card drills into...
+- Batches screen (`lib/features/batches/batches_screen.dart`): add/edit
+  batches within a department (old `offers.php`), tapping a batch
+  drills into...
+- Batch students screen (`lib/features/students/batch_students_screen.dart`):
+  students enrolled in that batch (old `clients.php`), with an "Enroll
+  student" flow that creates/matches a Student, an Enrollment, and
+  generates the payment schedule via `PaymentDao.generateScheduleForEnrollment`.
+- Students screen: search box + status filter chips wired to
+  `StudentDao.search()`, add-student dialog, tap-through to...
+- Student detail screen (`lib/features/students/student_detail_screen.dart`):
+  status + staff-assignment dropdowns, every enrollment with its full
+  payment schedule (record payments inline), and an editable notes
+  field — the equivalent of old `dashboard.php`'s edit/view modals.
+- Staff screen: simple roster CRUD (full name/username/role) — this is
+  NOT a login screen, see the auth note below.
 - Payments dashboard: full due/overdue list with working
-  one-tap-reminder.
+  one-tap-reminder and one-tap "Record payment".
+- Windows/Linux platform scaffolding (`windows/`, generated via
+  `flutter create`) — this was **missing entirely** at handoff, which
+  meant `.github/workflows/build-windows.yml`'s `flutter build windows`
+  step could never have succeeded. If a build platform folder ever goes
+  missing again (e.g. after a bad merge), regenerate it with
+  `flutter create --platforms=windows --org com.temidove --project-name temidove_crm .`
+  — it only fills in missing platform files, it won't touch `lib/`.
+- A widget smoke test (`test/widget_test.dart`) boots the real app shell
+  against an in-memory database (`AppDatabase.forTesting`) and checks
+  all 5 nav destinations render — run with `flutter test`.
 
-What's NOT built yet — the real remaining work:
+Deliberately NOT built, by design decision rather than oversight:
 
-1. **MySQL dump importer** — `legacy/Temidove_Online_PHP/temidove_database.sql`
-   → `Departments` + `Staff` + `Students`/`Enrollments`. No parser
-   exists for this yet. A `.sql` file is annoying to parse reliably;
-   consider asking the client to export each table as CSV instead if
-   they still have DB access, and writing a CSV importer instead —
-   much less brittle than hand-rolling SQL parsing.
-2. **Excel importer → database commit step.** The parser
-   (`ExcelBatchImporter`) and preview UI (`ImportScreen`) exist; wiring
-   a confirmed `ParsedBatchSheet` into actual `Batches` /
-   `Enrollments` / `Students` / `Payments` rows does not.
-3. **Batches screen and Students-filtered-by-batch screen** — the
-   old `offers.php` → `clients.php` drill-down. `DepartmentsScreen`
-   has a `TODO` at the tap handler for exactly this.
-4. **Student detail view** — enrollments, full payment history, notes,
-   staff assignment editing. Old `dashboard.php`'s edit/view modals are
-   the reference for what fields matter.
-5. **Auth** — `Staff.passwordHash` exists in the schema; no login
-   screen or session handling has been built. Decide whether v1 even
-   needs a login screen (single-PC-per-staff might not) before
-   building it — check with the client if unsure.
-6. **Reports/export** — mentioned in planning as a nice-to-have
+1. **Auth / login screen.** `Staff.passwordHash` exists in the schema
+   and the CSV importer carries over the old app's bcrypt hashes
+   as-is (never decoded, never re-hashed) so they're preserved if this
+   is revisited — but no login screen or session handling exists. This
+   was an open question at handoff ("does v1 need login given each
+   staff PC has its own local database?") and nothing since has settled
+   it either way — **still confirm with the client before shipping**.
+2. **Reports/export.** Mentioned in planning as a nice-to-have
    (accountant-facing Excel/PDF export) — not started, not urgent for
    v1.
 
@@ -124,9 +157,19 @@ What's NOT built yet — the real remaining work:
 - What did "offer 1/2/3" actually mean in the old system? It was
   never anything but a fixed 3-option dropdown with no other business
   logic attached — worth confirming it's safe to fold into per-batch
-  pricing rather than preserving as a separate concept.
+  pricing rather than preserving as a separate concept. (The CSV legacy
+  importer currently folds course+level+offer into one synthesized
+  Batch per unique combination, priced at the department's standard
+  fee — see `csv_legacy_importer.dart` — as a reasonable default given
+  this was never resolved.)
 - Does v1 need a login screen at all, given each staff PC will (for
-  now) have its own local database?
+  now) have its own local database? Still unresolved — see "Current
+  state" above.
+- The Excel importer has now been exercised structurally (parse →
+  preview → commit) but still only against the one sample file from
+  handoff. **Get 2-3 more real filled-in batch trackers from the
+  client before trusting it on production data** — this caveat from
+  the original handoff still stands.
 
 ## Build & run
 

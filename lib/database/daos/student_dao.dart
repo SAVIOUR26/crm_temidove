@@ -56,6 +56,16 @@ class StudentDao extends DatabaseAccessor<AppDatabase> with _$StudentDaoMixin {
     return result;
   }
 
+  /// Exact phone match, used by the batch-tracker importer to avoid
+  /// creating a duplicate Student row for someone already in the system.
+  Future<Student?> findByPhone(String phone) =>
+      (select(students)
+            ..where((s) => s.phone.equals(phone) & s.isDeleted.equals(false)))
+          .getSingleOrNull();
+
+  Stream<Student?> watchById(String id) =>
+      (select(students)..where((s) => s.id.equals(id))).watchSingleOrNull();
+
   Future<int> upsert(StudentsCompanion entry) =>
       into(students).insertOnConflictUpdate(entry);
 
@@ -63,6 +73,14 @@ class StudentDao extends DatabaseAccessor<AppDatabase> with _$StudentDaoMixin {
       (update(students)..where((s) => s.id.equals(studentId))).write(
         StudentsCompanion(
           status: Value(newStatus),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+
+  Future<void> updateNotes(String studentId, String? notes) =>
+      (update(students)..where((s) => s.id.equals(studentId))).write(
+        StudentsCompanion(
+          notes: Value(notes),
           updatedAt: Value(DateTime.now()),
         ),
       );

@@ -7,7 +7,7 @@ part 'batch_dao.g.dart';
 class BatchDao extends DatabaseAccessor<AppDatabase> with _$BatchDaoMixin {
   BatchDao(super.db);
 
-  Stream<List<Batch>> watchForDepartment(String departmentId) =>
+  Stream<List<BatchData>> watchForDepartment(String departmentId) =>
       (select(batches)
             ..where((b) =>
                 b.departmentId.equals(departmentId) &

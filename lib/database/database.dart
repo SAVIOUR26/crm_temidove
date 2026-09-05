@@ -26,7 +26,6 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3_flutter_libs/sqlite3_flutter_libs.dart';
 
 import 'daos/department_dao.dart';
 import 'daos/batch_dao.dart';
@@ -35,6 +34,17 @@ import 'daos/student_dao.dart';
 import 'daos/enrollment_dao.dart';
 import 'daos/payment_dao.dart';
 import 'daos/reminder_dao.dart';
+
+// Re-export the DAOs' small result-holder classes (DepartmentWithBatchCount,
+// PaymentWithContext, etc.) so screens only need `import 'database.dart'`
+// rather than reaching into lib/database/daos/ directly.
+export 'daos/department_dao.dart';
+export 'daos/batch_dao.dart';
+export 'daos/staff_dao.dart';
+export 'daos/student_dao.dart';
+export 'daos/enrollment_dao.dart';
+export 'daos/payment_dao.dart';
+export 'daos/reminder_dao.dart';
 
 part 'database.g.dart';
 
@@ -65,7 +75,9 @@ class Departments extends Table with SyncableColumns {
 /// A running cohort within a department — an instructor teaching a level
 /// to a group of students on a shared fee/schedule. This is the entity
 /// the old system never had a name for.
-@DataClassName('Batch')
+// Named BatchData (not Batch) to avoid colliding with drift's own Batch
+// class (the batch-write helper used in DAOs' `batch((b) { ... })` calls).
+@DataClassName('BatchData')
 class Batches extends Table with SyncableColumns {
   TextColumn get departmentId =>
       text().references(Departments, #id)();
@@ -196,6 +208,10 @@ class ReminderLog extends Table with SyncableColumns {
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  // Lets widget/DAO tests run against an in-memory database instead of a
+  // real file on disk — see test/widget_test.dart.
+  AppDatabase.forTesting(super.executor);
+
   // Bump this whenever a table shape changes and add a migration step —
   // see the Drift docs on schema migrations. Don't skip this: this app
   // holds live financial data, silent data loss on upgrade is not
@@ -211,11 +227,9 @@ class AppDatabase extends _$AppDatabase {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    // sqlite3_flutter_libs bundles a recent SQLite build for Windows —
-    // needed because the version that ships with older Windows installs
-    // is sometimes too old for Drift's feature set.
-    applyWorkaroundToOpenSqlite3OnOldWindows();
-
+    // sqlite3_flutter_libs bundles a recent SQLite build and wires it up
+    // at build time for Windows/macOS/Linux — no runtime workaround call
+    // needed on desktop (that API only exists for old Android versions).
     final dbFolder = await getApplicationSupportDirectory();
     final file = File(p.join(dbFolder.path, 'temidove_crm.sqlite'));
     return NativeDatabase.createInBackground(file);

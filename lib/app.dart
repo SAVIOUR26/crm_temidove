@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'features/departments/departments_screen.dart';
 import 'features/payments/payments_dashboard_screen.dart';
+import 'features/staff/staff_screen.dart';
 import 'features/students/students_screen.dart';
 import 'features/import/import_screen.dart';
 
@@ -58,6 +59,11 @@ class _AppShellState extends State<AppShell> {
       label: Text('Students'),
     ),
     NavigationRailDestination(
+      icon: Icon(Icons.badge_outlined),
+      selectedIcon: Icon(Icons.badge),
+      label: Text('Staff'),
+    ),
+    NavigationRailDestination(
       icon: Icon(Icons.upload_file_outlined),
       selectedIcon: Icon(Icons.upload_file),
       label: Text('Import'),
@@ -68,6 +74,7 @@ class _AppShellState extends State<AppShell> {
     PaymentsDashboardScreen(),
     DepartmentsScreen(),
     StudentsScreen(),
+    StaffScreen(),
     ImportScreen(),
   ];
 
