@@ -28,7 +28,7 @@ class ReminderService {
 
   String buildMessage({
     required Student student,
-    required Batch batch,
+    required BatchData batch,
     required Payment payment,
   }) {
     final amount = _currency.format(payment.expectedAmount - payment.paidAmount);
@@ -50,7 +50,7 @@ class ReminderService {
   /// "reminded" state.
   Future<bool> sendReminder({
     required Student student,
-    required Batch batch,
+    required BatchData batch,
     required Payment payment,
     required String message,
     String? sentByStaffId,

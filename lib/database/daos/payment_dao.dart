@@ -107,9 +107,13 @@ class PaymentDao extends DatabaseAccessor<AppDatabase> with _$PaymentDaoMixin {
         paidAmount: Value(newPaid),
         status: Value(newStatus),
         datePaid: Value(datePaid ?? DateTime.now()),
-        agentName: Value(agentName),
-        agentPhone: Value(agentPhone),
-        notes: Value(notes),
+        // Only overwrite these when this call actually supplies them, so a
+        // second (e.g. partial) payment on the same installment doesn't
+        // blank out the agent info recorded on the first one.
+        agentName: agentName != null ? Value(agentName) : const Value.absent(),
+        agentPhone:
+            agentPhone != null ? Value(agentPhone) : const Value.absent(),
+        notes: notes != null ? Value(notes) : const Value.absent(),
         updatedAt: Value(DateTime.now()),
       ),
     );
@@ -117,12 +121,21 @@ class PaymentDao extends DatabaseAccessor<AppDatabase> with _$PaymentDaoMixin {
 
   Future<int> upsert(PaymentsCompanion entry) =>
       into(payments).insertOnConflictUpdate(entry);
+
+  /// The full payment schedule for one enrollment, oldest due date first —
+  /// feeds the student detail screen's payment history table.
+  Stream<List<Payment>> watchForEnrollment(String enrollmentId) =>
+      (select(payments)
+            ..where((p) =>
+                p.enrollmentId.equals(enrollmentId) & p.isDeleted.equals(false))
+            ..orderBy([(p) => OrderingTerm.asc(p.dueDate)]))
+          .watch();
 }
 
 class PaymentWithContext {
   final Payment payment;
   final Student student;
-  final Batch batch;
+  final BatchData batch;
   PaymentWithContext(
       {required this.payment, required this.student, required this.batch});
 }

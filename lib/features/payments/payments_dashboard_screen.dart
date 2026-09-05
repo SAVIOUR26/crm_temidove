@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../database/database.dart';
 import '../reminders/reminder_service.dart';
+import 'record_payment_dialog.dart';
 
 /// The "due & overdue" view — direct replacement for the manual Excel
 /// "Payment Reminder Dashboard" sheet, but computed live instead of
@@ -59,6 +60,14 @@ class _PaymentsDashboardScreenState extends State<PaymentsDashboardScreen> {
               currency: _currency,
               dateFmt: _dateFmt,
               onRemind: () => _sendReminder(db, rows[i]),
+              onRecordPayment: () async {
+                await showDialog(
+                  context: context,
+                  builder: (_) =>
+                      RecordPaymentDialog(db: db, payment: rows[i].payment),
+                );
+                setState(_reload);
+              },
             ),
           );
         },
@@ -101,12 +110,14 @@ class _PaymentRow extends StatelessWidget {
   final NumberFormat currency;
   final DateFormat dateFmt;
   final VoidCallback onRemind;
+  final VoidCallback onRecordPayment;
 
   const _PaymentRow({
     required this.paymentContext,
     required this.currency,
     required this.dateFmt,
     required this.onRemind,
+    required this.onRecordPayment,
   });
 
   @override
@@ -131,10 +142,20 @@ class _PaymentRow extends StatelessWidget {
         '${paymentContext.batch.level ?? "—"} · due ${dateFmt.format(payment.dueDate)} '
         '· ${currency.format(balance)} outstanding',
       ),
-      trailing: FilledButton.tonalIcon(
-        onPressed: onRemind,
-        icon: const Icon(Icons.chat_bubble_outline, size: 18),
-        label: const Text('Remind'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+            onPressed: onRecordPayment,
+            child: const Text('Record payment'),
+          ),
+          const SizedBox(width: 8),
+          FilledButton.tonalIcon(
+            onPressed: onRemind,
+            icon: const Icon(Icons.chat_bubble_outline, size: 18),
+            label: const Text('Remind'),
+          ),
+        ],
       ),
     );
   }

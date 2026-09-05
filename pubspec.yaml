@@ -22,7 +22,8 @@ dependencies:
 
   # Legacy data import
   excel: ^4.0.0          # pure-Dart .xlsx reader, used by the batch-tracker importer
-  file_picker: ^8.0.0    # let staff pick the legacy .sql / .xlsx files to import
+  file_picker: ^8.0.0    # let staff pick the legacy CSV / .xlsx files to import
+  csv: ^6.0.0            # parses the old PHP app's MySQL tables exported as CSV
 
   # Payment reminders — opens WhatsApp Desktop / web with a pre-filled message
   url_launcher: ^6.3.0
